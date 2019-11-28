@@ -1,0 +1,16 @@
+# specify the node base image with your desired version node:<version>
+FROM node:8
+
+ENV HUBOT_NAME myhubot
+ENV HUBOT_OWNER "keniooi@github.com"
+ENV HUBOT_DESCRIPTION "Hubot Slack"
+
+RUN useradd hubot -m -g root
+
+RUN npm install -g hubot yo generator-hubot coffee-script
+
+USER hubot
+
+WORKDIR /home/hubot
+
+RUN umask 002 && yes | yo hubot --adapter=slack --owner="${HUBOT_OWNER}" --name="${HUBOT_NAME}" --description="${HUBOT_DESCRIPTION}" 

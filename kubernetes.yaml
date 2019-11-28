@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot4you-deployment
+  labels:
+    app: bot4you
+spec:
+  selector:
+    matchLabels:
+      app: bot4you
+  template:
+    metadata:
+      labels:
+        app: bot4you
+    spec:
+      containers:
+      - name: bot4you-container
+        image: docker-registry.default.svc:5000/nodejs/bot4you:latest
+        ports:
+        - containerPort: 8080
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: bot4you-service
+spec:
+  selector:
+    app: bot4you
+  ports:
+  - protocol: TCP
+    port: 8080
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: bot4you-route
+spec:
+  to:
+    kind: Service
+    name: bot4you-service

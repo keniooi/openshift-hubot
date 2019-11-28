@@ -1,0 +1,93 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  app: hubot
+  template: hubot
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+
+  For more information about using this template, including OpenShift considerations, see https://github.com/keniooi/openshift-hubot/blob/master/README.md.
+metadata:
+  annotations:
+    description: An hubot slack application to listen slack messages
+      For more information about using this template, including OpenShift
+      considerations, see https://github.com/keniooi/openshift-hubot/blob/master/README.md.
+    iconClass: icon-apache
+    openshift.io/display-name: Hubot Slack
+    openshift.io/documentation-url: https://github.com/keniooi/openshit-hubot
+    openshift.io/long-description: This template defines resources needed to develop
+      a hubot slack, including a build configuration and application deployment configuration.
+    openshift.io/provider-display-name: keniooi
+    openshift.io/support-url: https://github.com/keniooi
+    tags: quickstart,hubot
+    template.openshift.io/bindable: "false"
+  creationTimestamp: null
+  name: hubot
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      description: Defines how to deploy the application server
+      template.alpha.openshift.io/wait-for-ready: "true"
+    name: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      name: ${NAME}
+    strategy:
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          name: ${NAME}
+        name: ${NAME}
+      spec:
+        containers:
+        - env:
+          - name: HUBOT_SLACK_TOKEN
+            value: ${HUBOT_SLACK_TOKEN}
+          - name: HUBOT_NAME
+            value: ${HUBOT_NAME}
+          name: ${NAME}
+          image: 'docker-registry.default.svc:5000/nodejs/bot4you'
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Exposes and load balances the application pods
+    name: ${NAME}
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: ${NAME}
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: ${NAME}
+  spec:
+    to:
+      kind: Service
+      name: ${NAME}
+parameters:
+- description: The name assigned to all of the frontend objects defined in this template.
+  displayName: Name
+  name: NAME
+  required: true
+  value: hubot
+- description: The token for access to slack as bot.
+  displayName: HUBOT_SLACK_TOKEN
+  name: HUBOT_SLACK_TOKEN
+  required: true
+  value: bot-token-replace-me
+- description: The hubot name
+  displayName: HUBOT_NAME
+  name: HUBOT_NAME
+  required: true
+  value: myhubot
