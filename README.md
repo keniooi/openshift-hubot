@@ -3,6 +3,7 @@ HUBOT_SLACK_TOKEN value is required in Dockerfile. if you use template, you can
 set it during deployment.
  
 ```
+docker build -t nodejs/hubot -f Dockerfile-hubot-base .
 docker build -t nodejs/bot4you .
 ```
 
